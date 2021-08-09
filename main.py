@@ -6,22 +6,29 @@ from newspaper import Article
 import json
 from newspaper import build
 
-#cannot read vietnamese
-#date and time seeems weird
-#
+#check if string is not blank
+def is_not_blank(s):
+    return bool(s and not s.isspace())
 
-#This function returns all the url found in base url given ie
+#This function returns all the url found in base url given: ie
 # 'https://vnexpress.net', 'https://cnn.com...
+
+
+
 def get_articles_url(url):
     url_set = []
-    setset = set()
+    set_url = set()
+    set_title = set()
     articles = build(url, memoize_articles=False)
 
     for article in articles.articles:
-        if article.url not in setset:
-            setset.add(article.url)
+        if article.url not in set_url and article.title not in set_title:
+            set_url.add(article.url)
+            set_title.add(article.title)
             url_set.append(article.url)
+
     return url_set
+
 
 
 #This function  return date, content, and article's title
@@ -29,67 +36,49 @@ def get_articles_url(url):
 def date_and_content(url):
 
     data = []
-    article = Article(url )
+    article = Article(url)
     article.download()
     article.parse()
     content = article.text
     date = article.publish_date
     title = article.title
+    title_check = set()
+    if title not in title_check:
+        title_check.add(title)
+        if is_not_blank(content):
+            if date is None:
+                data.append({
+                    "Title": title,
+                    "date": "no date found",
+                    "Content": content,
+                })
 
-    if date is not None:
-        date = date.strftime('%Y-%m-%d')
-        data.append({
-            "Title": title,
-            "date":date,
-            "Content": content,
-        })
-    else:
-        data.append({
-            "Title": title,
-            "date": "no date found",
-            "Content": content,
-        })
-    data2 = json.dumps(data)
+            else:
+                date = date.strftime('%Y-%m-%d')
+
+                data.append({
+                    "Title": title,
+                    "date": date,
+                    "Content": content,
+                })
+    data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
     return data2
 
-# Same as the function above but trying to make it read vietnamese news
-def date_and_content_vi(url):
-    data = []
-    article = Article(url, language='vi')
-    article.download()
-    article.parse()
-    content = article.text
-    date = article.publish_date
-    title = article.title
 
-    if date is not None:
-        date = date.strftime('%Y-%m-%d')
-        data.append({
-            "Title": title,
-            "date":date,
-            "Content": content,
-        })
-    else:
-        data.append({
-            "Title": title,
-            "date": "no date found",
-            "Content": content,
-        })
-    data2 = json.dumps(data)
-    return data2
-
+def the_machine(original_url):
+    url_set = get_articles_url(original_url)
+    for url in url_set:
+        dt = date_and_content(url)
+        print(dt.decode())
 
 # TESTING SECTION
 
 
-#origin_url = 'https://vnexpress.net'
 origin_url = 'https://cnn.com'
-url_set = get_articles_url(origin_url)
 
-for url in url_set:
-    #print(url)
-    dt = date_and_content(url)
-    print(dt)
+#origin_url = 'https://cnn.com'
+
+the_machine(origin_url)
 
 
 # beautifulsoup example
