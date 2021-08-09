@@ -19,9 +19,11 @@ def date_and_content(url):
     article.parse()
     content = article.text
     date = article.publish_date
+    title = article.title
     print(date)
     data.append({
-        "publish date":date.isoformat(),
+        "title": title,
+        "date":date.isoformat(),
         "content": content,
     })
     data2 = json.dumps(data)
