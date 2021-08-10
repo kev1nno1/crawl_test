@@ -24,7 +24,7 @@ def get_articles_url(url):
             set_url.add(article.url)
             set_title.add(article.title)
             url_set.append(article.url)
-
+    #print(url_set)
     return url_set
 
 
@@ -45,7 +45,7 @@ def date_and_content(url):
         if title not in title_check:
             title_check.add(title)
             if is_not_blank(content):
-                if date is None:
+                if date is None and article is not None:
                     data.append({
                         "Title": title,
                         "date": "no date found",
@@ -62,37 +62,33 @@ def date_and_content(url):
                         "Content": content,
                     })
 
-            # print(type(data))
-        data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
-        # print(type(data2))
-        # print(data2.decode())
-
-        return data2
+        return data
 
     except:
         print('out of lines')
 
 
-
-
-
 def the_machine(original_url):
+    data = []
     print('Machine is working\n')
     url_set = get_articles_url(original_url)
+    #print(url_set)
     print('Gathering data\n')
     print("Url set!\n")
-    count = 0
+    checker = True
+    counter = 0
     for url in url_set:
-        print(url)
-        dt = json.loads(date_and_content(url))
+        if checker:
+            dt = date_and_content(url)
+            data.append(dt)
+            counter += 1
+        if(counter == 20):
+            checker= False
+            data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
+            return data2
 
 
-        if count > 20:
-            break
-        else:
-            count += 1
-    return dt
-        #print(dt.decode())
+
 
 
 
@@ -102,35 +98,15 @@ def the_machine(original_url):
 
 #origin_url = 'https://plo.vn/'
 
-origin_url = 'https://zing.vn'
+origin_url = 'https://www.foxnews.com/'
 
 results = the_machine(origin_url)
+data = json.loads(results)
 print('System: getting result')
+#for result in results:
+for result in data:
+    print(result)
 
-print(json.loads(results))
-
-
-# beautifulsoup example
-
-#number= ["1","2","3","4","5"]
-# for i in range(5):
-#     url = "https://www.bbc.co.uk/search?q=crypto+currency&page="
-#
-#     new_link = url + number[i]
-#     print(new_link)
-#     response = requests.get(new_link)
-#     soup = BeautifulSoup(response.content, "html.parser")
-#     articles = soup.find_all('div', class_='ssrcss-1cbga70-Stack e1y4nx260')
-#
-#
-#     for article in articles:
-#         title = article.find('span',{"aria-hidden":"false"})
-#
-#         link = article.find('a').attrs["href"]
-#         print('\n')
-#         print(title.get_text())
-#         print (link)
-#         print ("--------------------")
 
 
 
