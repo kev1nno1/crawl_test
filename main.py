@@ -32,6 +32,7 @@ def get_articles_url(url):
 # and return in json format
 def date_and_content(url):
     try:
+
         data = []
         article = Article(url)
         article.download()
@@ -40,16 +41,17 @@ def date_and_content(url):
         date = article.publish_date
         title = article.title
         title_check = set()
+
         if title not in title_check:
             title_check.add(title)
             if is_not_blank(content):
-
                 if date is None:
                     data.append({
                         "Title": title,
                         "date": "no date found",
                         "Content": content,
                     })
+
 
                 else:
                     date = date.strftime('%Y-%m-%d')
@@ -59,15 +61,18 @@ def date_and_content(url):
                         "date": date,
                         "Content": content,
                     })
+
+            # print(type(data))
+        data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
+        # print(type(data2))
+        # print(data2.decode())
+
+        return data2
+
     except:
         print('out of lines')
 
-    finally:
-        #print(type(data))
-        data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
-        #print(type(data2))
-        print(data2.decode())
-        return data2
+
 
 
 
@@ -76,12 +81,20 @@ def the_machine(original_url):
     url_set = get_articles_url(original_url)
     print('Gathering data\n')
     print("Url set!\n")
+    count = 0
     for url in url_set:
+        print(url)
+        dt = json.loads(date_and_content(url))
 
-        dt = date_and_content(url)
-        #print(dt.decode())
-    print('Machine done \n')
+
+        if count > 20:
+            break
+        else:
+            count += 1
     return dt
+        #print(dt.decode())
+
+
 
 
 # TESTING SECTION
@@ -91,9 +104,10 @@ def the_machine(original_url):
 
 origin_url = 'https://zing.vn'
 
-result = the_machine(origin_url)
+results = the_machine(origin_url)
 print('System: getting result')
-print(result)
+
+print(json.loads(results))
 
 
 # beautifulsoup example
