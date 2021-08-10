@@ -1,20 +1,18 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
-
 from newspaper import Article
 import json
 from newspaper import build
+
 
 #check if string is not blank
 def is_not_blank(s):
     return bool(s and not s.isspace())
 
+
 #This function returns all the url found in base url given: ie
 # 'https://vnexpress.net', 'https://cnn.com...
-
-
-
 def get_articles_url(url):
     url_set = []
     set_url = set()
@@ -30,55 +28,72 @@ def get_articles_url(url):
     return url_set
 
 
-
 #This function  return date, content, and article's title
 # and return in json format
 def date_and_content(url):
+    try:
+        data = []
+        article = Article(url)
+        article.download()
+        article.parse()
+        content = article.text
+        date = article.publish_date
+        title = article.title
+        title_check = set()
+        if title not in title_check:
+            title_check.add(title)
+            if is_not_blank(content):
 
-    data = []
-    article = Article(url)
-    article.download()
-    article.parse()
-    content = article.text
-    date = article.publish_date
-    title = article.title
-    title_check = set()
-    if title not in title_check:
-        title_check.add(title)
-        if is_not_blank(content):
-            if date is None:
-                data.append({
-                    "Title": title,
-                    "date": "no date found",
-                    "Content": content,
-                })
+                if date is None:
+                    data.append({
+                        "Title": title,
+                        "date": "no date found",
+                        "Content": content,
+                    })
 
-            else:
-                date = date.strftime('%Y-%m-%d')
+                else:
+                    date = date.strftime('%Y-%m-%d')
 
-                data.append({
-                    "Title": title,
-                    "date": date,
-                    "Content": content,
-                })
-    data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
-    return data2
+                    data.append({
+                        "Title": title,
+                        "date": date,
+                        "Content": content,
+                    })
+    except:
+        print('out of lines')
+
+    finally:
+        #print(type(data))
+        data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
+        #print(type(data2))
+        print(data2.decode())
+        return data2
+
 
 
 def the_machine(original_url):
+    print('Machine is working\n')
     url_set = get_articles_url(original_url)
+    print('Gathering data\n')
+    print("Url set!\n")
     for url in url_set:
+
         dt = date_and_content(url)
-        print(dt.decode())
+        #print(dt.decode())
+    print('Machine done \n')
+    return dt
+
 
 # TESTING SECTION
 
 
-origin_url = 'https://cnn.com'
+#origin_url = 'https://plo.vn/'
 
-#origin_url = 'https://cnn.com'
+origin_url = 'https://zing.vn'
 
-the_machine(origin_url)
+result = the_machine(origin_url)
+print('System: getting result')
+print(result)
 
 
 # beautifulsoup example
