@@ -57,7 +57,7 @@ def date_and_content(url):
                         "date": date,
                         "Content": content,
                     })
-        return data
+            return data
     except Exception as e:
         print(e)
 
@@ -74,8 +74,9 @@ def the_machine(original_url):
     for url in url_set:
         if checker:
             dt = date_and_content(url)
-            data.append(dt)
-            counter += 1
+            if dt is not None:
+                data.append(dt)
+                counter += 1
         if(counter == 20):
             checker= False
             data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
