@@ -4,7 +4,7 @@ import datetime
 from newspaper import Article
 import json
 from newspaper import build
-
+import os
 
 #check if string is not blank
 def is_not_blank(s):
@@ -12,7 +12,7 @@ def is_not_blank(s):
 
 
 #This function returns all the url found in base url given: ie
-# 'https://vnexpress.net', 'https://cnn.com...
+# 'https://vnexpress.net', 'https://cnn.com'...
 def get_articles_url(url):
     url_set = []
     set_url = set()
@@ -32,7 +32,6 @@ def get_articles_url(url):
 # and return in json format
 def date_and_content(url):
     try:
-
         data = []
         article = Article(url)
         article.download()
@@ -42,7 +41,7 @@ def date_and_content(url):
         title = article.title
         title_check = set()
 
-        if title not in title_check:
+        if title not in title_check and type(content) == str and len(content) > 1:
             title_check.add(title)
             if is_not_blank(content):
                 if date is None and article is not None:
@@ -51,21 +50,16 @@ def date_and_content(url):
                         "date": "no date found",
                         "Content": content,
                     })
-
-
                 else:
                     date = date.strftime('%Y-%m-%d')
-
                     data.append({
                         "Title": title,
                         "date": date,
                         "Content": content,
                     })
-
         return data
-
-    except:
-        print('out of lines')
+    except Exception as e:
+        print(e)
 
 
 def the_machine(original_url):
@@ -91,21 +85,26 @@ def the_machine(original_url):
 
 
 
-
+#date/tuoitre.vn/filejson
 
 # TESTING SECTION
 
 
-#origin_url = 'https://plo.vn/'
+#cwd = os.getcwd()
+#print(cwd)
 
-origin_url = 'https://www.foxnews.com/'
+
+origin_url = 'https://plo.vn/'
+
+#origin_url = 'https://www.foxnews.com/'
+#origin_url = 'https://cnn.com'
 
 results = the_machine(origin_url)
 data = json.loads(results)
 print('System: getting result')
 #for result in results:
 for result in data:
-    print(result)
+     print(result)
 
 
 
