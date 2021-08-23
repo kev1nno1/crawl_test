@@ -46,16 +46,18 @@ def date_and_content(url):
             if is_not_blank(content):
                 if date is None and article is not None:
                     data.append({
-                        "Title": title,
-                        "date": "no date found",
-                        "Content": content,
+                        'title': title,
+                        'date': "no date found",
+                        'content': content,
+                        'url': url
                     })
                 else:
                     date = date.strftime('%Y-%m-%d')
                     data.append({
-                        "Title": title,
-                        "date": date,
-                        "Content": content,
+                        'title': title,
+                        'date': date,
+                        'content': content,
+                        'url': url
                     })
             return data
     except Exception as e:
@@ -90,11 +92,13 @@ def the_machine(original_url):
 
 # TESTING SECTION
 
-
-#cwd = os.getcwd()
-#print(cwd)
-
-
+# date = datetime.datetime.now()
+# parent = 'C:/Users/Thinh/PycharmProjects/crawl_test'
+# #directory = "test1"
+# directory = date = date.strftime("%m-%d-%Y")
+#
+# path = os.path.join(parent, directory)
+# os.mkdir(path)
 origin_url = 'https://plo.vn/'
 
 #origin_url = 'https://www.foxnews.com/'
@@ -103,10 +107,8 @@ origin_url = 'https://plo.vn/'
 results = the_machine(origin_url)
 data = json.loads(results)
 print('System: getting result')
-#for result in results:
 for result in data:
-     print(result)
-
-
+   # im trying to get only date of news here
+    print(result['date'])
 
 
