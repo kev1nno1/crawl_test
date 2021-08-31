@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block head %}
+
+
+ {% if tasks|length < 1  %}
+    <h4 style="font-size:3vw">There are no tasks. Create one below!</h4>
+    {% else %}
+    <table>
+        <tr>
+            <th>Task</th>
+            <th>Actions</th>
+        </tr>
+
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.content }}</td>
+            <td>
+                <a href="delete/{{task.id}}">Delete</a> <br>
+                <a href="update/{{task.id}}">Update</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+ <form action="/" method="POST">
+        <input type="text" name="content" id="content" placeholder="Please type">
+        <input type="submit" value="Add Task">
+
+</form>
+
+{% endblock %}

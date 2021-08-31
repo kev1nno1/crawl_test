@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urlparse
 import datetime
 from newspaper import Article
 import json
@@ -40,25 +41,27 @@ def date_and_content(url):
         date = article.publish_date
         title = article.title
         title_check = set()
-
+        single_dict = {}
         if title not in title_check and type(content) == str and len(content) > 1:
             title_check.add(title)
             if is_not_blank(content):
                 if date is None and article is not None:
-                    data.append({
-                        'title': title,
-                        'date': "no date found",
-                        'content': content,
-                        'url': url
-                    })
+                    single_dict ={
+                        "title": title,
+                        "date": "no-date-found",
+                        "content": content,
+                        "url": url
+                    }
+                    data.append(single_dict)
                 else:
                     date = date.strftime('%Y-%m-%d')
-                    data.append({
-                        'title': title,
-                        'date': date,
-                        'content': content,
-                        'url': url
-                    })
+                    single_dict = {
+                        "title": title,
+                        "date": date,
+                        "content": content,
+                        "url": url
+                    }
+                    data.append(single_dict)
             return data
     except Exception as e:
         print(e)
@@ -74,16 +77,52 @@ def the_machine(original_url):
     checker = True
     counter = 0
     for url in url_set:
-        if checker:
-            dt = date_and_content(url)
-            if dt is not None:
-                data.append(dt)
-                counter += 1
-        if(counter == 20):
-            checker= False
-            data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
-            return data2
+        dt = date_and_content(url)
+        if dt is not None:
+            data.append(dt)
+            print(counter + 10)
+            counter += 1
 
+        if(counter == 50):
+            #data2 = json.dumps(data, ensure_ascii=False).encode('utf8')
+            #return data
+            save_to_file(data)
+
+            return 0
+
+
+def save_to_file(results):
+    print('Gathering data')
+    counter = 0
+    parent = 'C:/Users/Thinh/PycharmProjects/crawl_test/'
+    for result in results:
+        url = result[0]['url']
+        print(url)
+        title = result[0]['title']
+        print(title)
+        pathz = url.split("/")[-1]
+        if (len(pathz) < 15):
+            pathz = url.split("/")[-2]
+        #CNN dung-2
+
+        domain = urlparse(url).netloc
+        date = result[0]['date']
+        print(date)
+        directory = domain + '/' + date
+        path = os.path.join(parent, directory)
+        file_name = pathz + '.json'
+        newpath = path + "/" + file_name
+        print(counter)
+        counter += 1
+        if not os.path.exists(path):
+            #make new date file
+            os.makedirs(path)
+            with open(newpath, 'w') as outfile:
+                json.dump(result, outfile)
+        else:
+            if not os.path.exists(newpath):
+                with open(newpath, 'w') as outfile:
+                    json.dump(result, outfile)
 
 
 
@@ -91,24 +130,18 @@ def the_machine(original_url):
 #date/tuoitre.vn/filejson
 
 # TESTING SECTION
-
-# date = datetime.datetime.now()
-# parent = 'C:/Users/Thinh/PycharmProjects/crawl_test'
-# #directory = "test1"
-# directory = date = date.strftime("%m-%d-%Y")
 #
-# path = os.path.join(parent, directory)
-# os.mkdir(path)
-origin_url = 'https://plo.vn/'
+#origin_url = 'https://vnexpress.net'
+#vnexpress returns no date
+origin_url = 'https://www.foxnews.com/'
+#origin_url = 'https://zingnews.vn/'
+#zingnews got some errors
 
-#origin_url = 'https://www.foxnews.com/'
-#origin_url = 'https://cnn.com'
+#origin_url = 'https://www.cnn.com/'
+#same error with zing
 
-results = the_machine(origin_url)
-data = json.loads(results)
-print('System: getting result')
-for result in data:
-   # im trying to get only date of news here
-    print(result['date'])
-
-
+#results = the_machine(origin_url)
+#data = json.loads(results)
+i = 4
+y = 66
+print(f'{i}+{y} = {i+y}')
